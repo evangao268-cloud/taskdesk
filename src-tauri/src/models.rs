@@ -18,15 +18,6 @@ pub enum TaskStatus {
     Completed,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DueNudgeDto {
-    pub id: String,
-    pub title: String,
-    pub interval_days: u32,
-    pub days_overdue: i64,
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum DismissMode {
@@ -43,6 +34,10 @@ pub struct Settings {
     pub autostart_enabled: bool,
     pub sync_interval_secs: u32,
     pub show_undated: bool,
+    #[serde(default)]
+    pub google_account_email: Option<String>,
+    #[serde(default)]
+    pub default_tasklist_id: Option<String>,
 }
 
 impl Default for Settings {
@@ -53,6 +48,8 @@ impl Default for Settings {
             autostart_enabled: false,
             sync_interval_secs: 300,
             show_undated: false,
+            google_account_email: None,
+            default_tasklist_id: None,
         }
     }
 }
@@ -72,7 +69,7 @@ pub struct DismissStateDto {
 pub struct BootView {
     pub today: Vec<TaskDto>,
     pub overdue: Vec<TaskDto>,
-    pub nudges: Vec<DueNudgeDto>,
+    pub nudges: Vec<crate::nudges::DueNudge>,
     pub undated: Vec<TaskDto>,
     pub settings: Settings,
     pub dismiss: DismissStateDto,

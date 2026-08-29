@@ -6,10 +6,14 @@
     addTask,
     completeTask,
     ackNudge,
+    listNudges,
+    addNudge,
+    deleteNudge,
     nothingToday,
     dismissWindow,
     updateSettings,
     type BootView,
+    type NudgeDef,
     type Settings,
   } from "$lib/api";
 
@@ -72,9 +76,38 @@
     }, 350);
   }
 
-  async function onAckNudge(id: string) {
-    await ackNudge(id);
+  async function onAckNudge(id: string, createTask: boolean) {
+    await ackNudge(id, createTask);
     await refresh();
+  }
+
+  let allNudges = $state<NudgeDef[]>([]);
+  let nudgeTitle = $state("");
+  let nudgeInterval = $state(14);
+  let nudgeMakesTask = $state(false);
+
+  async function refreshNudges() {
+    allNudges = await listNudges();
+  }
+
+  async function submitNudge() {
+    const title = nudgeTitle.trim();
+    if (!title || nudgeInterval < 1) return;
+    await addNudge(title, nudgeInterval, nudgeMakesTask);
+    nudgeTitle = "";
+    await refreshNudges();
+    await refresh();
+  }
+
+  async function removeNudge(id: string) {
+    await deleteNudge(id);
+    await refreshNudges();
+    await refresh();
+  }
+
+  async function openSettings() {
+    await refreshNudges();
+    showSettings = true;
   }
 
   async function tryDismiss() {
@@ -139,7 +172,7 @@
       </p>
     </div>
     <div class="header-actions">
-      <button class="icon-btn" title="Settings" onclick={() => (showSettings = !showSettings)}>⚙</button>
+      <button class="icon-btn" title="Settings" onclick={() => (showSettings ? (showSettings = false) : openSettings())}>⚙</button>
       <button
         class="icon-btn close"
         title="Dismiss"
@@ -189,6 +222,31 @@
             onchange={(e) => saveSettings({ showUndated: e.currentTarget.checked })}
           />
         </label>
+        <h2>Nudges</h2>
+        <div class="add">
+          <input
+            placeholder="e.g. Check in with Mom"
+            bind:value={nudgeTitle}
+            onkeydown={(e) => e.key === "Enter" && submitNudge()}
+          />
+          <input class="days" type="number" min="1" max="365" bind:value={nudgeInterval} title="Every N days" />
+          <button class="primary" onclick={submitNudge} disabled={!nudgeTitle.trim()}>Add</button>
+        </div>
+        <label class="row">
+          <span>New nudge also creates a task when marked done</span>
+          <input type="checkbox" bind:checked={nudgeMakesTask} />
+        </label>
+        <ul>
+          {#each allNudges as n (n.id)}
+            <li>
+              <div class="task-text">
+                <span>{n.title}</span>
+                <small>every {n.intervalDays} day{n.intervalDays === 1 ? "" : "s"}{n.createTaskOnAck ? " · makes a task" : ""}</small>
+              </div>
+              <button class="ghost" onclick={() => removeNudge(n.id)}>Remove</button>
+            </li>
+          {/each}
+        </ul>
         <p class="hint">Google sync and start-at-login arrive in later milestones.</p>
       </section>
     {:else}
@@ -245,7 +303,7 @@
                   <span>{n.title}</span>
                   <small>every {n.intervalDays} days{n.daysOverdue > 0 ? ` · ${n.daysOverdue}d late` : ""}</small>
                 </div>
-                <button class="ghost" onclick={() => onAckNudge(n.id)}>Done</button>
+                <button class="ghost" onclick={() => onAckNudge(n.id, n.createTaskOnAck)}>Done</button>
               </li>
             {/each}
           </ul>
@@ -475,6 +533,10 @@
   }
   .settings {
     flex: 1;
+    overflow-y: auto;
+  }
+  .days {
+    width: 64px;
   }
   .settings .row {
     display: flex;

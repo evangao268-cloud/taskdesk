@@ -24,7 +24,7 @@ impl DismissGate {
 }
 
 pub fn dismiss_state(state: &AppState) -> DismissStateDto {
-    let settings = state.settings.lock().unwrap();
+    let settings = state.store.settings();
     let gate = state.gate.lock().unwrap();
     let blocked_for_ms = match settings.dismiss_mode {
         DismissMode::Instant => 0,

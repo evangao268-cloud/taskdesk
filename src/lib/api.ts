@@ -16,6 +16,16 @@ export interface DueNudgeDto {
   title: string;
   intervalDays: number;
   daysOverdue: number;
+  createTaskOnAck: boolean;
+}
+
+export interface NudgeDef {
+  id: string;
+  title: string;
+  intervalDays: number;
+  anchorDate: string;
+  createTaskOnAck: boolean;
+  enabled: boolean;
 }
 
 export interface Settings {
@@ -24,6 +34,8 @@ export interface Settings {
   autostartEnabled: boolean;
   syncIntervalSecs: number;
   showUndated: boolean;
+  googleAccountEmail: string | null;
+  defaultTasklistId: string | null;
 }
 
 export interface DismissState {
@@ -47,7 +59,12 @@ export const addTask = (title: string, dueDate?: string) =>
   invoke<TaskDto>("add_task", { title, dueDate: dueDate ?? null, notes: null });
 export const completeTask = (localId: string) =>
   invoke<TaskDto>("complete_task", { localId });
-export const ackNudge = (nudgeId: string) => invoke<void>("ack_nudge", { nudgeId });
+export const ackNudge = (nudgeId: string, createTask: boolean) =>
+  invoke<void>("ack_nudge", { nudgeId, createTask });
+export const listNudges = () => invoke<NudgeDef[]>("list_nudges");
+export const addNudge = (title: string, intervalDays: number, createTaskOnAck: boolean) =>
+  invoke<NudgeDef>("add_nudge", { title, intervalDays, createTaskOnAck });
+export const deleteNudge = (id: string) => invoke<void>("delete_nudge", { id });
 export const nothingToday = () => invoke<void>("nothing_today");
 export const dismissWindow = () => invoke<DismissState>("dismiss_window");
 export const getDismissState = () => invoke<DismissState>("get_dismiss_state");
