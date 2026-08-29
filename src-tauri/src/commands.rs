@@ -1,5 +1,6 @@
 use tauri::{AppHandle, Emitter, State};
 
+use crate::google::GoogleError;
 use crate::models::*;
 use crate::nudges::{self, NudgeDef};
 use crate::window;
@@ -36,6 +37,19 @@ pub fn get_boot_view(state: State<AppState>) -> Result<BootView, String> {
     let acks = state.store.nudge_acks().map_err(err_str)?;
     let due = nudges::due_nudges(&defs, &acks, today());
     let tasks = state.store.open_tasks().map_err(err_str)?;
+    let sync = SyncSummary {
+        state: *state.sync_state.lock().unwrap(),
+        pending_outbox: state.store.outbox_count(),
+        last_sync_at: state.store.get_meta("last_sync_at"),
+        connected: state
+            .auth
+            .lock()
+            .unwrap()
+            .as_ref()
+            .map(|a| a.is_connected())
+            .unwrap_or(false),
+        email: settings.google_account_email.clone(),
+    };
 
     let today = today_str();
     let mut view = BootView {
@@ -45,6 +59,7 @@ pub fn get_boot_view(state: State<AppState>) -> Result<BootView, String> {
         undated: vec![],
         settings,
         dismiss,
+        sync,
     };
     for t in tasks {
         match &t.due_date {
@@ -82,6 +97,7 @@ pub fn add_task(
         .insert_local_task(&task, &tasklist)
         .map_err(err_str)?;
     mark_engaged(&state);
+    state.sync_kick.notify_one();
     let _ = app.emit("tasks-changed", ());
     Ok(task)
 }
@@ -97,6 +113,7 @@ pub fn complete_task(
         .set_task_status(&local_id, TaskStatus::Completed)
         .map_err(err_str)?;
     mark_engaged(&state);
+    state.sync_kick.notify_one();
     let _ = app.emit("tasks-changed", ());
     Ok(task)
 }
@@ -187,8 +204,90 @@ pub fn ack_nudge(
         )
         .map_err(err_str)?;
     mark_engaged(&state);
+    state.sync_kick.notify_one();
     let _ = app.emit("tasks-changed", ());
     Ok(())
+}
+
+#[derive(serde::Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct AuthStatus {
+    pub connected: bool,
+    pub email: Option<String>,
+    pub config_present: bool,
+}
+
+#[tauri::command]
+pub fn get_auth_status(state: State<AppState>) -> AuthStatus {
+    let config_present = crate::google::ClientConfig::load(&state.data_dir).is_some();
+    let connected = state
+        .auth
+        .lock()
+        .unwrap()
+        .as_ref()
+        .map(|a| a.is_connected())
+        .unwrap_or(false);
+    AuthStatus {
+        connected,
+        email: state.store.settings().google_account_email,
+        config_present,
+    }
+}
+
+#[tauri::command]
+pub async fn start_google_auth(
+    app: AppHandle,
+    state: State<'_, AppState>,
+) -> Result<AuthStatus, String> {
+    let auth = state.ensure_auth().map_err(err_str)?;
+    let opener = app.clone();
+    let email = auth
+        .interactive_signin(move |url| {
+            use tauri_plugin_opener::OpenerExt;
+            opener
+                .opener()
+                .open_url(url, None::<&str>)
+                .map_err(|e| e.to_string())
+        })
+        .await
+        .map_err(err_str)?;
+    let mut settings = state.store.settings();
+    settings.google_account_email = if email.is_empty() { None } else { Some(email) };
+    state.store.save_settings(&settings).map_err(err_str)?;
+    state.sync_kick.notify_one();
+    let _ = app.emit("sync-status-changed", ());
+    Ok(get_auth_status(state))
+}
+
+#[tauri::command]
+pub fn disconnect_google(app: AppHandle, state: State<AppState>) -> Result<(), String> {
+    if let Some(auth) = state.auth.lock().unwrap().as_ref() {
+        auth.disconnect().map_err(err_str)?;
+    }
+    let mut settings = state.store.settings();
+    settings.google_account_email = None;
+    state.store.save_settings(&settings).map_err(err_str)?;
+    let _ = app.emit("sync-status-changed", ());
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn sync_now(
+    app: AppHandle,
+    state: State<'_, AppState>,
+) -> Result<crate::sync::SyncReport, String> {
+    let auth = state.ensure_auth().map_err(err_str)?;
+    if !auth.is_connected() {
+        return Err(GoogleError::NotConnected.to_string());
+    }
+    *state.sync_state.lock().unwrap() = crate::sync::SyncState::Syncing;
+    let _ = app.emit("sync-status-changed", ());
+    let engine = crate::sync::SyncEngine::new(state.store.clone(), auth);
+    let report = engine.sync().await;
+    *state.sync_state.lock().unwrap() = report.state;
+    let _ = app.emit("sync-status-changed", ());
+    let _ = app.emit("tasks-changed", ());
+    Ok(report)
 }
 
 #[tauri::command]
@@ -217,6 +316,18 @@ pub fn update_settings(
     state: State<AppState>,
     settings: Settings,
 ) -> Result<Settings, String> {
+    {
+        use tauri_plugin_autostart::ManagerExt;
+        let autolaunch = app.autolaunch();
+        let result = if settings.autostart_enabled {
+            autolaunch.enable()
+        } else {
+            autolaunch.disable()
+        };
+        if let Err(e) = result {
+            log::warn!("autostart toggle failed: {e}");
+        }
+    }
     state.store.save_settings(&settings).map_err(err_str)?;
     let _ = app.emit("settings-changed", settings.clone());
     Ok(settings)

@@ -66,6 +66,16 @@ pub struct DismissStateDto {
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct SyncSummary {
+    pub state: crate::sync::SyncState,
+    pub pending_outbox: i64,
+    pub last_sync_at: Option<String>,
+    pub connected: bool,
+    pub email: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct BootView {
     pub today: Vec<TaskDto>,
     pub overdue: Vec<TaskDto>,
@@ -73,4 +83,5 @@ pub struct BootView {
     pub undated: Vec<TaskDto>,
     pub settings: Settings,
     pub dismiss: DismissStateDto,
+    pub sync: SyncSummary,
 }

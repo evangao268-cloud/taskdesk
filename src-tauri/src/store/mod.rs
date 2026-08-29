@@ -270,6 +270,166 @@ impl Store {
         tx.commit()
     }
 
+
+    // ---- sync support ----
+
+    pub fn upsert_tasklist(&self, id: &str, title: &str) -> rusqlite::Result<()> {
+        let conn = self.conn.lock().unwrap();
+        conn.execute(
+            "INSERT INTO tasklists (id, title) VALUES (?1, ?2)
+             ON CONFLICT(id) DO UPDATE SET title = excluded.title",
+            params![id, title],
+        )?;
+        Ok(())
+    }
+
+    pub fn tasklists(&self) -> rusqlite::Result<Vec<(String, Option<String>)>> {
+        let conn = self.conn.lock().unwrap();
+        let mut stmt = conn.prepare("SELECT id, sync_watermark FROM tasklists")?;
+        let rows = stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?;
+        rows.collect()
+    }
+
+    pub fn set_watermark(&self, tasklist_id: &str, watermark: &str) -> rusqlite::Result<()> {
+        let conn = self.conn.lock().unwrap();
+        conn.execute(
+            "UPDATE tasklists SET sync_watermark = ?2 WHERE id = ?1",
+            params![tasklist_id, watermark],
+        )?;
+        Ok(())
+    }
+
+    /// Is this local row dirty (pending local changes)? None if unknown id.
+    pub fn task_by_google_id(&self, google_id: &str) -> rusqlite::Result<Option<(String, bool)>> {
+        let conn = self.conn.lock().unwrap();
+        conn.query_row(
+            "SELECT local_id, dirty FROM tasks WHERE google_id = ?1",
+            params![google_id],
+            |r| Ok((r.get(0)?, r.get(1)?)),
+        )
+        .optional()
+    }
+
+    /// Apply a remote (non-deleted) task to the cache. Caller must have
+    /// already skipped dirty rows.
+    pub fn apply_remote_task(
+        &self,
+        google_id: &str,
+        tasklist_id: &str,
+        title: &str,
+        notes: Option<&str>,
+        due_date: Option<&str>,
+        status: &str,
+        updated: Option<&str>,
+        position: Option<&str>,
+    ) -> rusqlite::Result<()> {
+        let conn = self.conn.lock().unwrap();
+        let existing: Option<String> = conn
+            .query_row(
+                "SELECT local_id FROM tasks WHERE google_id = ?1",
+                params![google_id],
+                |r| r.get(0),
+            )
+            .optional()?;
+        match existing {
+            Some(local_id) => {
+                conn.execute(
+                    "UPDATE tasks SET title = ?2, notes = ?3, due_date = ?4, status = ?5,
+                     updated = ?6, position = ?7, tasklist_id = ?8, deleted = 0
+                     WHERE local_id = ?1",
+                    params![local_id, title, notes, due_date, status, updated, position, tasklist_id],
+                )?;
+            }
+            None => {
+                conn.execute(
+                    "INSERT INTO tasks (local_id, google_id, tasklist_id, title, notes, due_date,
+                     status, updated, position, deleted, dirty)
+                     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, 0, 0)",
+                    params![
+                        uuid::Uuid::new_v4().to_string(),
+                        google_id,
+                        tasklist_id,
+                        title,
+                        notes,
+                        due_date,
+                        status,
+                        updated,
+                        position
+                    ],
+                )?;
+            }
+        }
+        Ok(())
+    }
+
+    /// Tombstone by google id (remote deletion); dirty rows are left alone.
+    pub fn tombstone_remote(&self, google_id: &str) -> rusqlite::Result<()> {
+        let conn = self.conn.lock().unwrap();
+        conn.execute(
+            "UPDATE tasks SET deleted = 1 WHERE google_id = ?1 AND dirty = 0",
+            params![google_id],
+        )?;
+        Ok(())
+    }
+
+    pub fn tombstone_local(&self, local_id: &str) -> rusqlite::Result<()> {
+        let conn = self.conn.lock().unwrap();
+        conn.execute(
+            "UPDATE tasks SET deleted = 1 WHERE local_id = ?1",
+            params![local_id],
+        )?;
+        Ok(())
+    }
+
+    pub fn set_google_id(
+        &self,
+        local_id: &str,
+        google_id: &str,
+        updated: Option<&str>,
+    ) -> rusqlite::Result<()> {
+        let conn = self.conn.lock().unwrap();
+        conn.execute(
+            "UPDATE tasks SET google_id = ?2, updated = COALESCE(?3, updated) WHERE local_id = ?1",
+            params![local_id, google_id, updated],
+        )?;
+        Ok(())
+    }
+
+    /// (google_id, tasklist_id, status, title, notes, due_date) for a push.
+    pub fn task_push_info(
+        &self,
+        local_id: &str,
+    ) -> rusqlite::Result<Option<(Option<String>, String, String, String, Option<String>, Option<String>)>> {
+        let conn = self.conn.lock().unwrap();
+        conn.query_row(
+            "SELECT google_id, tasklist_id, status, title, notes, due_date
+             FROM tasks WHERE local_id = ?1",
+            params![local_id],
+            |r| {
+                Ok((
+                    r.get(0)?,
+                    r.get(1)?,
+                    r.get(2)?,
+                    r.get(3)?,
+                    r.get(4)?,
+                    r.get(5)?,
+                ))
+            },
+        )
+        .optional()
+    }
+
+    /// Repoint cached tasks from a placeholder list id (e.g. "@default") to the
+    /// real Google list id once known.
+    pub fn reassign_tasklist(&self, from: &str, to: &str) -> rusqlite::Result<()> {
+        let conn = self.conn.lock().unwrap();
+        conn.execute(
+            "UPDATE tasks SET tasklist_id = ?2 WHERE tasklist_id = ?1",
+            params![from, to],
+        )?;
+        Ok(())
+    }
+
     // ---- outbox ----
 
     pub fn outbox_pending(&self, now: &str) -> rusqlite::Result<Vec<OutboxEntry>> {

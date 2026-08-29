@@ -45,6 +45,29 @@ export interface DismissState {
   allowed: boolean;
 }
 
+export type SyncState = "idle" | "syncing" | "offline" | "auth_error";
+
+export interface SyncSummary {
+  state: SyncState;
+  pendingOutbox: number;
+  lastSyncAt: string | null;
+  connected: boolean;
+  email: string | null;
+}
+
+export interface AuthStatus {
+  connected: boolean;
+  email: string | null;
+  configPresent: boolean;
+}
+
+export interface SyncReport {
+  pulled: number;
+  pushed: number;
+  deferred: number;
+  state: SyncState;
+}
+
 export interface BootView {
   today: TaskDto[];
   overdue: TaskDto[];
@@ -52,6 +75,7 @@ export interface BootView {
   undated: TaskDto[];
   settings: Settings;
   dismiss: DismissState;
+  sync: SyncSummary;
 }
 
 export const getBootView = () => invoke<BootView>("get_boot_view");
@@ -71,3 +95,7 @@ export const getDismissState = () => invoke<DismissState>("get_dismiss_state");
 export const getSettings = () => invoke<Settings>("get_settings");
 export const updateSettings = (settings: Settings) =>
   invoke<Settings>("update_settings", { settings });
+export const getAuthStatus = () => invoke<AuthStatus>("get_auth_status");
+export const startGoogleAuth = () => invoke<AuthStatus>("start_google_auth");
+export const disconnectGoogle = () => invoke<void>("disconnect_google");
+export const syncNow = () => invoke<SyncReport>("sync_now");

@@ -12,6 +12,9 @@
     nothingToday,
     dismissWindow,
     updateSettings,
+    startGoogleAuth,
+    disconnectGoogle,
+    syncNow,
     type BootView,
     type NudgeDef,
     type Settings,
@@ -110,6 +113,44 @@
     showSettings = true;
   }
 
+  let authBusy = $state(false);
+  let authError = $state("");
+
+  async function connectGoogle() {
+    authBusy = true;
+    authError = "";
+    try {
+      await startGoogleAuth();
+      await refresh();
+    } catch (e) {
+      authError = String(e);
+    } finally {
+      authBusy = false;
+    }
+  }
+
+  async function doDisconnect() {
+    await disconnectGoogle();
+    await refresh();
+  }
+
+  async function doSyncNow() {
+    authError = "";
+    try {
+      await syncNow();
+    } catch (e) {
+      authError = String(e);
+    }
+    await refresh();
+  }
+
+  const syncLabel: Record<string, string> = {
+    idle: "synced",
+    syncing: "syncing…",
+    offline: "offline",
+    auth_error: "sign-in needed",
+  };
+
   async function tryDismiss() {
     const result = await dismissWindow();
     if (!result.allowed) {
@@ -168,7 +209,7 @@
     <div data-tauri-drag-region>
       <h1 data-tauri-drag-region>{dateLabel}</h1>
       <p class="subtitle" data-tauri-drag-region>
-        {openCount === 0 ? "All clear." : `${openCount} thing${openCount === 1 ? "" : "s"} need you`}
+        {openCount === 0 ? "All clear." : openCount === 1 ? "1 thing needs you" : `${openCount} things need you`}
       </p>
     </div>
     <div class="header-actions">
@@ -215,6 +256,26 @@
           </label>
         {/if}
         <label class="row">
+          <span>Start when I sign in to Windows</span>
+          <input
+            type="checkbox"
+            checked={view.settings.autostartEnabled}
+            onchange={(e) => saveSettings({ autostartEnabled: e.currentTarget.checked })}
+          />
+        </label>
+        <label class="row">
+          <span>Sync every</span>
+          <select
+            value={String(view.settings.syncIntervalSecs)}
+            onchange={(e) => saveSettings({ syncIntervalSecs: +e.currentTarget.value })}
+          >
+            <option value="120">2 minutes</option>
+            <option value="300">5 minutes</option>
+            <option value="900">15 minutes</option>
+            <option value="1800">30 minutes</option>
+          </select>
+        </label>
+        <label class="row">
           <span>Show undated tasks</span>
           <input
             type="checkbox"
@@ -222,6 +283,27 @@
             onchange={(e) => saveSettings({ showUndated: e.currentTarget.checked })}
           />
         </label>
+        <h2>Google Tasks</h2>
+        {#if view.sync.connected}
+          <div class="row">
+            <span>{view.sync.email ?? "Connected"} · {syncLabel[view.sync.state]}{view.sync.pendingOutbox > 0 ? ` · ${view.sync.pendingOutbox} pending` : ""}</span>
+            <span>
+              <button class="ghost" onclick={doSyncNow}>Sync now</button>
+              <button class="ghost" onclick={doDisconnect}>Disconnect</button>
+            </span>
+          </div>
+        {:else}
+          <div class="row">
+            <span>Not connected</span>
+            <button class="primary" onclick={connectGoogle} disabled={authBusy}>
+              {authBusy ? "Waiting for browser…" : "Connect Google"}
+            </button>
+          </div>
+        {/if}
+        {#if authError}
+          <p class="auth-error">{authError}</p>
+        {/if}
+
         <h2>Nudges</h2>
         <div class="add">
           <input
@@ -537,6 +619,14 @@
   }
   .days {
     width: 64px;
+  }
+  .settings .row {
+    font-size: 0.85rem;
+  }
+  .auth-error {
+    color: #e07a6a;
+    font-size: 0.78rem;
+    word-break: break-word;
   }
   .settings .row {
     display: flex;
