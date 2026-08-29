@@ -21,6 +21,7 @@
   let blockedMs = $state(0);
   let denied = $state(false);
   let completing = $state<Set<string>>(new Set());
+  let loadError = $state("");
 
   let countdownTimer: ReturnType<typeof setInterval> | null = null;
   let unlisteners: UnlistenFn[] = [];
@@ -31,7 +32,13 @@
   };
 
   async function refresh() {
-    view = await getBootView();
+    try {
+      view = await getBootView();
+      loadError = "";
+    } catch (e) {
+      loadError = String(e);
+      return;
+    }
     blockedMs = view.dismiss.blockedForMs;
     startCountdown();
   }
@@ -144,6 +151,9 @@
     </div>
   </header>
 
+  {#if loadError}
+    <p style="color:#e07a6a; font-size:0.8rem; word-break:break-all;">{loadError}</p>
+  {/if}
   {#if view}
     {#if showSettings}
       <section class="settings">

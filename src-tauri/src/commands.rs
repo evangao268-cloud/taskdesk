@@ -14,15 +14,22 @@ fn mark_engaged(state: &AppState) {
 
 #[tauri::command]
 pub fn get_boot_view(state: State<AppState>) -> BootView {
+    log::info!("get_boot_view invoked");
+    // dismiss_state locks `settings` internally, so take these sequentially:
+    // guards created inside one struct expression all live to the end of the
+    // statement, and a nested settings.lock() there self-deadlocks.
+    let dismiss = window::dismiss_state(&state);
+    let settings = state.settings.lock().unwrap().clone();
+    let nudges = state.fake_nudges.lock().unwrap().clone();
     let tasks = state.tasks.lock().unwrap();
     let today = today_str();
     let mut view = BootView {
         today: vec![],
         overdue: vec![],
-        nudges: state.fake_nudges.lock().unwrap().clone(),
+        nudges,
         undated: vec![],
-        settings: state.settings.lock().unwrap().clone(),
-        dismiss: window::dismiss_state(&state),
+        settings,
+        dismiss,
     };
     for t in tasks.iter().filter(|t| t.status == TaskStatus::NeedsAction) {
         match &t.due_date {
