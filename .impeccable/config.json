@@ -1,0 +1,32 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-radius",
+        "value": "3px",
+        "createdAt": "2026-08-30T22:00:58.956Z",
+        "reason": "model triage: half-width pill radius on the 6px scrollbar thumb, derived from element size not the radius scale"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "2px",
+        "createdAt": "2026-08-30T22:00:59.070Z",
+        "reason": "model triage: half-height pill radius on the 4px Fluent slider track, derived from element size not the radius scale"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "10px",
+        "createdAt": "2026-08-30T22:00:59.180Z",
+        "reason": "model triage: icon-glyph size for the checkmark inside the 24px check circle, not a text ramp step"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "26px",
+        "createdAt": "2026-08-30T22:00:59.300Z",
+        "reason": "model triage: empty-state Fluent icon size, recorded in DESIGN.md typography as the empty-state glyph size"
+      }
+    ]
+  }
+}

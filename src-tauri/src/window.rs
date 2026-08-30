@@ -84,7 +84,12 @@ pub fn attach_close_guard(app: &AppHandle) {
                 // and bypass the pause/engage modes via Alt+F4). Route through
                 // the policy; hide-to-tray on success.
                 api.prevent_close();
-                try_dismiss(&handle);
+                let dto = try_dismiss(&handle);
+                if !dto.allowed {
+                    // Let the frontend show the refusal (shake + countdown),
+                    // otherwise an Alt+F4 during pause/engage fails silently.
+                    let _ = handle.emit("dismiss-denied", dto);
+                }
             }
         });
     }
@@ -104,8 +109,8 @@ pub fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
         .on_menu_event(|app, event| match event.id.as_ref() {
             "show" => show_main_window(app),
             "sync" => {
-                // Wired to the sync engine in M4.
-                let _ = app.emit("sync-requested", ());
+                // Kick the scheduler; it syncs when a connected auth client exists.
+                app.state::<AppState>().sync_kick.notify_one();
             }
             "quit" => app.exit(0),
             _ => {}

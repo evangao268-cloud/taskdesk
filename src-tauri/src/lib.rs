@@ -124,6 +124,7 @@ pub fn run() {
             commands::delete_nudge,
             commands::ack_nudge,
             commands::nothing_today,
+            commands::engage,
             commands::dismiss_window,
             commands::get_dismiss_state,
             commands::get_settings,

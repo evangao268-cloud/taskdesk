@@ -99,3 +99,5 @@ export const getAuthStatus = () => invoke<AuthStatus>("get_auth_status");
 export const startGoogleAuth = () => invoke<AuthStatus>("start_google_auth");
 export const disconnectGoogle = () => invoke<void>("disconnect_google");
 export const syncNow = () => invoke<SyncReport>("sync_now");
+/** Mark the engage gate satisfied (user acted on the window). */
+export const engage = () => invoke<void>("engage");

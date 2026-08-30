@@ -1,4 +1,4 @@
-use tauri::{AppHandle, Emitter, State};
+use tauri::{AppHandle, Emitter, Manager, State};
 
 use crate::google::GoogleError;
 use crate::models::*;
@@ -241,7 +241,12 @@ pub async fn start_google_auth(
 ) -> Result<AuthStatus, String> {
     let auth = state.ensure_auth().map_err(err_str)?;
     let opener = app.clone();
-    let email = auth
+    // The consent page opens in the system browser behind this always-on-top
+    // window; stop occluding it for the duration of the sign-in.
+    if let Some(w) = app.get_webview_window("main") {
+        let _ = w.set_always_on_top(false);
+    }
+    let result = auth
         .interactive_signin(move |url| {
             use tauri_plugin_opener::OpenerExt;
             opener
@@ -249,8 +254,12 @@ pub async fn start_google_auth(
                 .open_url(url, None::<&str>)
                 .map_err(|e| e.to_string())
         })
-        .await
-        .map_err(err_str)?;
+        .await;
+    if let Some(w) = app.get_webview_window("main") {
+        let _ = w.set_always_on_top(true);
+        let _ = w.set_focus();
+    }
+    let email = result.map_err(err_str)?;
     let mut settings = state.store.settings();
     settings.google_account_email = if email.is_empty() { None } else { Some(email) };
     state.store.save_settings(&settings).map_err(err_str)?;
@@ -292,6 +301,14 @@ pub async fn sync_now(
 
 #[tauri::command]
 pub fn nothing_today(state: State<AppState>) {
+    mark_engaged(&state);
+}
+
+/// Mark the engage gate satisfied without any other side effect. The frontend
+/// calls this on an optimistic (undoable) action so the close button unlocks
+/// immediately instead of waiting for the deferred commit.
+#[tauri::command]
+pub fn engage(state: State<AppState>) {
     mark_engaged(&state);
 }
 

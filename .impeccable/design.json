@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-30T00:00:00Z",
+  "title": "Design System: TaskDesk",
+  "extensions": {
+    "colorMeta": {
+      "accent": {
+        "role": "primary",
+        "displayName": "System Accent",
+        "canonical": "#005fb8",
+        "darkVariant": "#60cdff",
+        "tonalRamp": ["oklch(15% 0.13 250)", "oklch(27% 0.13 250)", "oklch(38% 0.13 250)", "oklch(48% 0.13 250)", "oklch(60% 0.12 245)", "oklch(72% 0.11 240)", "oklch(84% 0.08 235)", "oklch(95% 0.03 230)"]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Fluent Surface",
+        "canonical": "#f9f9f9",
+        "darkVariant": "#262626",
+        "tonalRamp": ["oklch(15% 0 0)", "oklch(26% 0 0)", "oklch(38% 0 0)", "oklch(50% 0 0)", "oklch(62% 0 0)", "oklch(74% 0 0)", "oklch(86% 0 0)", "oklch(97% 0 0)"]
+      },
+      "control": {
+        "role": "neutral",
+        "displayName": "Control Fill",
+        "canonical": "#ffffff",
+        "darkVariant": "rgba(255, 255, 255, 0.061)",
+        "tonalRamp": ["oklch(18% 0 0)", "oklch(30% 0 0)", "oklch(42% 0 0)", "oklch(54% 0 0)", "oklch(66% 0 0)", "oklch(78% 0 0)", "oklch(90% 0 0)", "oklch(100% 0 0)"]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Primary Text",
+        "canonical": "#1b1b1b",
+        "darkVariant": "#ffffff",
+        "tonalRamp": ["oklch(15% 0 0)", "oklch(25% 0 0)", "oklch(37% 0 0)", "oklch(49% 0 0)", "oklch(61% 0 0)", "oklch(73% 0 0)", "oklch(85% 0 0)", "oklch(95% 0 0)"]
+      },
+      "text-2": {
+        "role": "neutral",
+        "displayName": "Secondary Text",
+        "canonical": "#5c5c5c",
+        "darkVariant": "#cfcfcf",
+        "tonalRamp": ["oklch(15% 0 0)", "oklch(26% 0 0)", "oklch(37% 0 0)", "oklch(48% 0 0)", "oklch(60% 0 0)", "oklch(72% 0 0)", "oklch(84% 0 0)", "oklch(95% 0 0)"]
+      },
+      "critical": {
+        "role": "status",
+        "displayName": "Critical Red",
+        "canonical": "#c42b1c",
+        "darkVariant": "#ff99a4",
+        "tonalRamp": ["oklch(15% 0.12 30)", "oklch(27% 0.16 30)", "oklch(39% 0.18 30)", "oklch(52% 0.19 30)", "oklch(63% 0.16 25)", "oklch(74% 0.12 20)", "oklch(85% 0.08 18)", "oklch(95% 0.03 15)"]
+      },
+      "warn-fill": {
+        "role": "status",
+        "displayName": "Warn Amber Fill",
+        "canonical": "#fdf3d7",
+        "darkVariant": "#3a3117",
+        "tonalRamp": ["oklch(18% 0.05 90)", "oklch(30% 0.07 90)", "oklch(42% 0.09 90)", "oklch(54% 0.1 90)", "oklch(66% 0.1 92)", "oklch(78% 0.09 94)", "oklch(88% 0.07 95)", "oklch(96% 0.04 95)"]
+      }
+    },
+    "typographyMeta": {
+      "headline": { "displayName": "Headline", "purpose": "The card's single h1 — date or greeting in the masthead. Segoe UI Variable Display." },
+      "title": { "displayName": "Panel Title", "purpose": "Settings panel heading. Display face, 17px/600." },
+      "section": { "displayName": "Section Heading", "purpose": "List section h2s in --text-2; Overdue variant switches to --critical. h3 drops to 13px." },
+      "body": { "displayName": "Body", "purpose": "Task titles and empty-state copy, 14px." },
+      "caption": { "displayName": "Caption", "purpose": "Subtitle, strips, undo bars, metadata, hints, errors — 12 to 12.5px, mostly --text-2." },
+      "icon": { "displayName": "Fluent Icon", "purpose": "Segoe Fluent Icons PUA glyphs; 12px base, 13px in icon buttons, 26px empty state. Always aria-hidden with a real label." }
+    },
+    "shadows": [
+      { "name": "card-elevation-light", "value": "0 2px 6px rgba(0, 0, 0, 0.08), 0 14px 32px rgba(0, 0, 0, 0.16)", "purpose": "The flyout card's only shadow (light theme). Nothing inside the card casts one." },
+      { "name": "card-elevation-dark", "value": "0 2px 6px rgba(0, 0, 0, 0.28), 0 16px 40px rgba(0, 0, 0, 0.45)", "purpose": "Dark-theme override of the card shadow." },
+      { "name": "scroll-shadow", "value": "radial-gradient(farthest-side at 50% 0, var(--scroll-shadow), transparent)", "purpose": "10px edge shadows on the scroll region, revealed only when content is hidden (background-attachment local/scroll layering)." }
+    ],
+    "motion": [
+      { "name": "enter", "value": "enter 0.2s ease-out (opacity 0.5, scale 0.985, translateY 4px -> rest)", "purpose": "Card entrance on show. Guarded by prefers-reduced-motion: no-preference." },
+      { "name": "shake", "value": "shake 0.4s (translateX ±6px)", "purpose": "Refusal feedback when the dismiss gate is not satisfied. Reduced-motion guarded." },
+      { "name": "switch-knob", "value": "transform 0.12s ease-out", "purpose": "Toggle-switch knob slide. Reduced-motion guarded." },
+      { "name": "done-fade", "value": "opacity 0.2s", "purpose": "Completed task text fade under strikethrough. Reduced-motion guarded." }
+    ],
+    "breakpoints": []
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The accent-filled commit action (Add, Connect Google).",
+      "html": "<button class=\"ds-btn-primary\">Add</button>",
+      "css": ".ds-btn-primary { background: var(--accent, #005fb8); color: var(--accent-text, #ffffff); border: none; border-radius: 4px; padding: 8px 14px; font-size: 13px; font-weight: 600; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif; cursor: pointer; } .ds-btn-primary:hover:not(:disabled) { background: var(--accent-hover, #0067c0); } .ds-btn-primary:disabled { opacity: 0.5; cursor: default; } .ds-btn-primary:focus-visible { outline: 2px solid var(--accent, #005fb8); outline-offset: 1px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Quiet bordered action (Sync now, Undo, Try again); .ds-danger variant is the two-step destructive confirm.",
+      "html": "<button class=\"ds-btn-ghost\">Sync now</button> <button class=\"ds-btn-ghost ds-danger\">Disconnect?</button>",
+      "css": ".ds-btn-ghost { background: transparent; border: 1px solid var(--stroke, rgba(0,0,0,0.09)); color: var(--text, #1b1b1b); border-radius: 4px; padding: 5px 10px; font-size: 12px; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif; cursor: pointer; } .ds-btn-ghost:hover { background: var(--subtle-hover, rgba(0,0,0,0.045)); } .ds-btn-ghost:focus-visible { outline: 2px solid var(--accent, #005fb8); outline-offset: 1px; } .ds-btn-ghost.ds-danger { color: var(--critical, #c42b1c); border-color: color-mix(in srgb, var(--critical, #c42b1c) 45%, transparent); }"
+    },
+    {
+      "name": "Icon Button",
+      "kind": "button",
+      "refersTo": "button-icon",
+      "description": "34px square glyph button (settings, close); aria-pressed tints the glyph accent.",
+      "html": "<button class=\"ds-icon-btn\" aria-label=\"Settings\"><span class=\"ds-fluent\" aria-hidden=\"true\">&#xE713;</span></button>",
+      "css": ".ds-icon-btn { background: transparent; border: 1px solid transparent; color: var(--text-2, #5c5c5c); width: 34px; height: 34px; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; } .ds-icon-btn:hover { background: var(--subtle-hover, rgba(0,0,0,0.045)); color: var(--text, #1b1b1b); } .ds-icon-btn[aria-pressed='true'] { background: var(--subtle-hover, rgba(0,0,0,0.045)); color: var(--accent, #005fb8); } .ds-icon-btn:focus-visible { outline: 2px solid var(--accent, #005fb8); outline-offset: 1px; } .ds-fluent { font-family: 'Segoe Fluent Icons', 'Segoe MDL2 Assets'; font-size: 13px; line-height: 1; font-style: normal; }"
+    },
+    {
+      "name": "Countdown Close",
+      "kind": "custom",
+      "refersTo": "button-icon",
+      "description": "The dismiss gate: close button whose border is a live conic-gradient countdown ring with a tabular-nums seconds count.",
+      "html": "<button class=\"ds-icon-btn ds-close-counting\" style=\"--pct: 0.6\" aria-label=\"Close in 4 seconds\"><span class=\"ds-count\">4</span></button>",
+      "css": ".ds-icon-btn { background: transparent; border: 1px solid transparent; color: var(--text-2, #5c5c5c); width: 34px; height: 34px; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; } .ds-close-counting { border-radius: 50%; border: 2px solid transparent; background: linear-gradient(var(--surface, #f9f9f9), var(--surface, #f9f9f9)) padding-box, conic-gradient(var(--accent, #005fb8) calc(var(--pct) * 1turn), var(--stroke, rgba(0,0,0,0.09)) 0) border-box; color: var(--text, #1b1b1b); } .ds-count { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-text",
+      "description": "Fluent text field: control fill, darker bottom edge, accent underline on focus (no ring).",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Add a task for today\" />",
+      "css": ".ds-input { box-sizing: border-box; background: var(--control, #ffffff); border: 1px solid var(--stroke, rgba(0,0,0,0.09)); border-bottom-color: var(--stroke-strong, rgba(0,0,0,0.18)); color: var(--text, #1b1b1b); border-radius: 4px; padding: 7px 10px; font-size: 13px; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif; } .ds-input::placeholder { color: var(--placeholder, #757575); } .ds-input:focus { outline: none; border-bottom: 2px solid var(--accent, #005fb8); padding-bottom: 6px; }"
+    },
+    {
+      "name": "Toggle Switch",
+      "kind": "input",
+      "description": "CSS-drawn 40x20 Fluent switch replacing the Chromium checkbox; knob slides 20px and recolors on check.",
+      "html": "<input class=\"ds-switch\" type=\"checkbox\" checked aria-label=\"Show undated tasks\" />",
+      "css": ".ds-switch { appearance: none; -webkit-appearance: none; box-sizing: border-box; width: 40px; height: 20px; border-radius: 10px; border: 1px solid var(--stroke-strong, rgba(0,0,0,0.18)); background: var(--control, #ffffff); position: relative; cursor: pointer; padding: 0; margin: 0; } .ds-switch::before { content: ''; position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; border-radius: 50%; background: var(--text-2, #5c5c5c); transition: transform 0.12s ease-out; } .ds-switch:checked { background: var(--accent, #005fb8); border-color: var(--accent, #005fb8); } .ds-switch:checked::before { transform: translateX(20px); background: var(--accent-text, #ffffff); } .ds-switch:focus-visible { outline: 2px solid var(--accent, #005fb8); outline-offset: 1px; }"
+    },
+    {
+      "name": "Trust Strip",
+      "kind": "chip",
+      "refersTo": "strip",
+      "description": "Sync-truth status row between masthead and lists; .ds-warn variant for errors, glyph flips accent to critical.",
+      "html": "<div class=\"ds-strip\" role=\"status\"><span class=\"ds-fluent ds-strip-icon\" aria-hidden=\"true\">&#xE73E;</span><span class=\"ds-strip-text\">Synced just now</span><button class=\"ds-strip-action\">Sync now</button></div>",
+      "css": ".ds-strip { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 4px; border: 1px solid var(--stroke, rgba(0,0,0,0.09)); background: var(--control, #ffffff); font-size: 12.5px; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif; color: var(--text, #1b1b1b); } .ds-strip.ds-warn { background: var(--warn-fill, #fdf3d7); border-color: var(--warn-stroke, rgba(157,93,0,0.25)); } .ds-strip.ds-warn .ds-strip-icon { color: var(--critical, #c42b1c); } .ds-strip-icon { color: var(--accent, #005fb8); flex: none; } .ds-fluent { font-family: 'Segoe Fluent Icons', 'Segoe MDL2 Assets'; font-size: 12px; line-height: 1; } .ds-strip-text { flex: 1; min-width: 0; } .ds-strip-action { background: transparent; border: 1px solid var(--stroke, rgba(0,0,0,0.09)); color: var(--text, #1b1b1b); border-radius: 4px; padding: 4px 8px; font-size: 12px; font-family: inherit; cursor: pointer; } .ds-strip-action:hover { background: var(--subtle-hover, rgba(0,0,0,0.045)); }"
+    },
+    {
+      "name": "Task Row",
+      "kind": "custom",
+      "description": "Flat list row with the 24px circular check whose glyph appears on hover over a 14% accent wash; overdue tag in critical.",
+      "html": "<ul class=\"ds-list\"><li class=\"ds-row\"><button class=\"ds-check\" aria-label=\"Complete task\"><span class=\"ds-check-glyph ds-fluent\" aria-hidden=\"true\">&#xE73E;</span></button><div class=\"ds-task-text\"><span>Renew car registration</span><small class=\"ds-overdue\">2 days overdue</small></div></li></ul>",
+      "css": ".ds-list { list-style: none; margin: 0; padding: 0; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif; } .ds-row { display: flex; align-items: center; gap: 10px; padding: 7px 6px; border-radius: 4px; } .ds-row:hover { background: var(--subtle-hover, rgba(0,0,0,0.045)); } .ds-check { box-sizing: border-box; width: 24px; height: 24px; min-width: 24px; border-radius: 50%; border: 2px solid var(--check-stroke, #767676); background: transparent; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 0; } .ds-check:hover { border-color: var(--accent, #005fb8); background: color-mix(in srgb, var(--accent, #005fb8) 14%, transparent); } .ds-check:hover .ds-check-glyph { color: var(--accent, #005fb8); } .ds-check:focus-visible { outline: 2px solid var(--accent, #005fb8); outline-offset: 1px; } .ds-check-glyph { font-size: 10px; color: transparent; } .ds-fluent { font-family: 'Segoe Fluent Icons', 'Segoe MDL2 Assets'; line-height: 1; } .ds-task-text { display: flex; flex-direction: column; flex: 1; min-width: 0; } .ds-task-text span { font-size: 14px; color: var(--text, #1b1b1b); } .ds-task-text small { font-size: 12px; color: var(--text-2, #5c5c5c); } .ds-overdue { color: var(--critical, #c42b1c) !important; }"
+    },
+    {
+      "name": "Segmented Control",
+      "kind": "chip",
+      "description": "Composer due-date picker; active segment mixes 18% accent into the control fill and goes semibold.",
+      "html": "<div class=\"ds-seg\" role=\"group\" aria-label=\"Due date\"><button class=\"ds-seg-btn ds-active\" aria-pressed=\"true\">Today</button><button class=\"ds-seg-btn\" aria-pressed=\"false\">Someday</button></div>",
+      "css": ".ds-seg { display: inline-flex; border: 1px solid var(--stroke, rgba(0,0,0,0.09)); border-radius: 4px; overflow: hidden; } .ds-seg-btn { background: var(--control, #ffffff); border: none; color: var(--text-2, #5c5c5c); padding: 7px 10px; font-size: 12px; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif; cursor: pointer; } .ds-seg-btn + .ds-seg-btn { border-left: 1px solid var(--stroke, rgba(0,0,0,0.09)); } .ds-seg-btn:hover { background: var(--control-hover, #f6f6f6); } .ds-seg-btn:focus-visible { outline: 2px solid var(--accent, #005fb8); outline-offset: 1px; } .ds-seg-btn.ds-active { background: color-mix(in srgb, var(--accent, #005fb8) 18%, var(--control, #ffffff)); color: var(--text, #1b1b1b); font-weight: 600; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Something Windows Drew",
+    "overview": "TaskDesk is a Windows 11 Notification Center flyout, not an app with a brand. Every surface, stroke, radius, and glyph is chosen so the 520x640 undecorated, transparent, always-on-top window reads as chrome the operating system itself would draw: Fluent mica-adjacent surfaces, one system accent per theme, Segoe UI Variable type, Segoe Fluent Icons. There is no logo, no brand color, no decoration — the identity is fidelity to the host OS.\n\nThe card is dense and glanceable: today's truth (overdue, due today, worth checking) leads; input sits pinned at the bottom. Both themes are first-class — the entire token set is defined in :root with a full prefers-color-scheme: dark override block, and no component references a raw color. The signature chrome is the dismiss gate: a close button whose border becomes a conic-gradient countdown ring, and a refusal shake when the gate is not satisfied.",
+    "keyCharacteristics": [
+      "System-native Fluent light/dark, driven entirely by CSS custom properties on :root",
+      "One accent per theme (#005FB8 light / #60CDFF dark); critical red is the only other chromatic voice",
+      "Segoe UI Variable ramp (Display for headings, Text for body); Segoe Fluent Icons PUA glyphs, no image assets",
+      "One elevated card; everything inside is flat, separated by hairline strokes and subtle control fills",
+      "Motion is rare, brief, and always prefers-reduced-motion guarded"
+    ],
+    "rules": [
+      { "name": "The One Accent Rule", "body": "Each theme has exactly one accent. Anything interactive that needs color uses --accent; anything wrong uses --critical. No third chromatic voice exists.", "section": "colors" },
+      { "name": "The Token-Only Rule", "body": "No component states a raw color. Both themes live entirely in the :root custom-property blocks; adding a color means adding it to both blocks.", "section": "colors" },
+      { "name": "The Two-Face Rule", "body": "Segoe UI Variable Display for 17px+ headings, Segoe UI Variable Text for everything else. No other family ever appears except the icon font.", "section": "typography" },
+      { "name": "The One Shadow Rule", "body": "The card floats; nothing inside it does. New surfaces get strokes and control fills, never box-shadows.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do draw every control the way Windows 11 would: Segoe Fluent Icons glyphs (with aria-hidden + a real label), CSS-drawn Fluent switches, the accent-underline focus idiom on text fields, 4px/8px radii.",
+      "Do define any new color in both :root blocks and consume it only via var(); test every surface in light and dark.",
+      "Do guard all motion behind prefers-reduced-motion: no-preference and keep it ≤0.4s.",
+      "Do use two-step inline confirms (ghost → danger-ghost \"…?\") and undo bars instead of dialogs.",
+      "Do keep status in strips (role=\"status\"/\"alert\") between the masthead and the lists."
+    ],
+    "donts": [
+      "Don't add a second accent, gradients-as-decoration, or brand color; --accent and --critical are the entire chromatic vocabulary.",
+      "Don't put a box-shadow on anything inside the card (The One Shadow Rule).",
+      "Don't introduce any font family beyond Segoe UI Variable (Display/Text) and Segoe Fluent Icons, or any raster/SVG image asset — this build ships zero images.",
+      "Don't add chrome Windows would not draw: no title bar, no modal dialogs, no custom window buttons beyond the gate-aware close.",
+      "Don't restyle the select's popup — its Chromium-drawn dropdown list is a documented, accepted exception (WebView2 residue), not a license for other non-Fluent chrome."
+    ]
+  }
+}
