@@ -982,6 +982,9 @@
   :global(html, body) {
     margin: 0;
     height: 100%;
+    /* Fixed-size window: the page must never scroll — .lists scrolls inside.
+       Without this, 1px of overflow summons the OS scrollbar. */
+    overflow: hidden;
   }
   :global(body) {
     font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
