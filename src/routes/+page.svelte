@@ -1016,18 +1016,19 @@
   }
 
   /* ---- card ---- */
+  /* The card fills the window edge-to-edge: WebView2 renders "transparent"
+     margins as a milky veil on some machines, so only the 8px corner curves
+     stay transparent. No CSS drop shadow — Windows shades borderless windows. */
   main {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    margin: 14px;
-    height: calc(100vh - 28px);
+    height: 100vh;
     padding: 18px 20px 16px;
     background: var(--surface);
     color: var(--text);
     border: 1px solid var(--card-stroke);
     border-radius: 8px;
-    box-shadow: var(--shadow);
     overflow: hidden;
   }
   @media (prefers-reduced-motion: no-preference) {
