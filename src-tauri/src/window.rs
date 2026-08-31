@@ -51,6 +51,9 @@ pub fn show_main_window(app: &AppHandle) {
     let state = app.state::<AppState>();
     *state.gate.lock().unwrap() = DismissGate::new();
     if let Some(window) = app.get_webview_window("main") {
+        // Re-assert the logical size: windows created at logon on mixed-DPI
+        // setups can materialize with the wrong scale factor and come up tiny.
+        let _ = window.set_size(tauri::LogicalSize::new(520.0, 640.0));
         let _ = window.center();
         // Re-assert on every show: always-on-top ties are z-ordered by creation.
         let _ = window.set_always_on_top(true);
