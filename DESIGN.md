@@ -24,7 +24,7 @@ colors:
 typography:
   headline:
     fontFamily: "Segoe UI Variable Display, Segoe UI, system-ui, sans-serif"
-    fontSize: "20px"
+    fontSize: "28px"
     fontWeight: 600
   title:
     fontFamily: "Segoe UI Variable Display, Segoe UI, system-ui, sans-serif"
@@ -151,7 +151,7 @@ A neutral Fluent surface stack with a single system accent; every value exists i
 **Character:** The Windows 11 system voice — optical-size-correct Segoe UI Variable, semibold headings, small quiet metadata. Nothing decorative; hierarchy comes from weight and the two-tone text colors, not size jumps.
 
 ### Hierarchy
-- **Headline** (600, 20px, Display): the card's single `h1` — date or greeting in the masthead.
+- **Headline** (600, 28px, Display, tight 1.15 line height): the card's single `h1` — the status line ("3 things need you" / "All clear.") at Fluent's Title step; the thesis at full typographic strength. The date sits above it as a 12.5px `--text-2` caption (bolder pass, user-approved 2026-08-30).
 - **Title** (600, 17px, Display): panel titles (Settings).
 - **Section** (600, 14px, `--text-2`): list section headings (`h2`); Overdue variant switches color to `--critical`. Settings sub-headings (`h3`) drop to 13px.
 - **Body** (400, 14px): task titles, empty-state copy.
@@ -165,7 +165,7 @@ A neutral Fluent surface stack with a single system accent; every value exists i
 
 One fixed, non-resizable 520×640 window (undecorated, transparent, always-on-top, centered). The visible world is a single card: `margin: 14px` inside the transparent window (room for the shadow), `height: calc(100vh - 28px)`, `padding: 18px 20px 16px`, flex column. There is no responsive behavior and no breakpoints.
 
-Vertical order is fixed by the thesis: masthead (h1 + subtitle, `data-tauri-drag-region`) with icon actions top-right → trust strip → scrollable lists region (`flex: 1; overflow-y: auto`) → undo bars → composer pinned at the bottom above a `--stroke` top border → footer. Settings replaces the lists region in place; the frame does not change.
+Vertical order is fixed by the thesis: masthead (date caption + status `h1`, `data-tauri-drag-region`) with icon actions top-right → trust strip → scrollable lists region (`flex: 1; overflow-y: auto`) → undo bars → composer pinned at the bottom above a `--stroke` top border → footer. Settings replaces the lists region in place; the frame does not change.
 
 Rhythm is a tight 6/8/10/12px scale: 6px between header icons, 8px control gaps, 10px in-row gaps, 12px composer top padding. List rows are `padding: 7px 6px` with 4px radii; controls are `padding: 7px 10px`. The scroll region uses the layered-gradient scroll-shadow technique (`--surface` fades over `--scroll-shadow` radial shadows, `background-attachment: local, scroll`) so edges only shadow when content is actually hidden; scrollbars are 6px, thumb `--stroke-strong`, track transparent.
 

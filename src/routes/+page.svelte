@@ -461,7 +461,7 @@
   );
   const ringPct = $derived(blockedMs > 0 ? blockedMs / pauseTotalMs : 0);
 
-  const subtitleText = $derived(
+  const statusText = $derived(
     loadError
       ? "Something went wrong"
       : !view
@@ -542,8 +542,8 @@
 <main class:denied class:entering data-tauri-drag-region>
   <header data-tauri-drag-region>
     <div class="masthead" data-tauri-drag-region>
-      <h1 data-tauri-drag-region>{dateLabel}</h1>
-      <p class="subtitle" aria-live="polite" data-tauri-drag-region>{subtitleText}</p>
+      <p class="date" data-tauri-drag-region>{dateLabel}</p>
+      <h1 aria-live="polite" data-tauri-drag-region>{statusText}</h1>
     </div>
     <div class="header-actions">
       <button
@@ -1061,16 +1061,18 @@
     align-items: flex-start;
     margin-bottom: 10px;
   }
-  h1 {
-    font-family: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
-    font-size: 20px;
-    font-weight: 600;
+  .date {
     margin: 0;
-  }
-  .subtitle {
-    margin: 2px 0 0;
     color: var(--text-2);
     font-size: 12.5px;
+  }
+  h1 {
+    font-family: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.15;
+    margin: 2px 0 0;
+    overflow-wrap: anywhere;
   }
   .header-actions {
     display: flex;

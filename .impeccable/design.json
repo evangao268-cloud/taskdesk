@@ -55,7 +55,7 @@
       }
     },
     "typographyMeta": {
-      "headline": { "displayName": "Headline", "purpose": "The card's single h1 — date or greeting in the masthead. Segoe UI Variable Display." },
+      "headline": { "displayName": "Headline", "purpose": "The card's single h1 — the status line at Fluent's 28px Title step; the date sits above it as a caption. Segoe UI Variable Display." },
       "title": { "displayName": "Panel Title", "purpose": "Settings panel heading. Display face, 17px/600." },
       "section": { "displayName": "Section Heading", "purpose": "List section h2s in --text-2; Overdue variant switches to --critical. h3 drops to 13px." },
       "body": { "displayName": "Body", "purpose": "Task titles and empty-state copy, 14px." },
